@@ -30,12 +30,12 @@ import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 
 
-/**
+/*******************************************************************************
 * @desc        The main gui interface for the chat client
 *
 * @date        9/15/2017
 * @author      Amber Normand, Erika Tobias, Kristen Merritt
-*/
+*******************************************************************************/
 
 
 
@@ -55,7 +55,7 @@ public class ClientGUI extends JFrame{
 	*/
 	public ClientGUI(){
 		//////////////////// set some preferences on the GUI
-      this.jf.setSize(850,500);
+      this.jf.setSize(600,500);
       this.jf.setLayout(new BorderLayout());
       this.jf.setLocationRelativeTo(null);
       this.jf.setResizable(false);
@@ -68,7 +68,7 @@ public class ClientGUI extends JFrame{
 		this.chatPanel = new ChatPanel();
 	
 	  	//////////////////// Lets get the program up for the first time
-     // jf.add(BorderLayout.PAGE_START, this.menuBar.getMenubar());//menu bar
+      jf.add(BorderLayout.PAGE_START, this.menuBar.getMenubar());//menu bar
       jf.add(this.loginPanel.getPanel());//login panel
    	
    	
@@ -76,9 +76,30 @@ public class ClientGUI extends JFrame{
       	//////////////////// Show it to the user
       jf.setVisible(true); // display jf
       jf.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); //close by default
-	
+		
+		
+		loginPanel.getConnectButton().addActionListener(
+         new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+               
+					connectToSocket();
+					
+            }//end action performed
+      });//end action listener
 	
 	}//end constructor
+	
+	public Boolean connectToSocket(){
+		this.jf.remove(this.loginPanel.getPanel());
+		
+		this.jf.add(this.chatPanel.getPanel());
+		
+		this.jf.revalidate();
+      this.jf.repaint();
+      pack();		
+		return true;
+	}
+	
 	
 	
 	
