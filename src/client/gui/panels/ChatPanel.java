@@ -80,18 +80,12 @@ public class ChatPanel{
 	
 	
 	/**
-	* 
+	* get the message the user wants to send
 	*/
-	public void sendMessage(){
+	public String getMessage(){
 	
-	}//end method: sendMessage
-	
-	
-	
-	public void addMessage(){
-	
-	}//end method: addMessage
-	
+		return "";
+	}//end method: getMessage
 	
 	
 	

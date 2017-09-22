@@ -101,7 +101,19 @@ public class ClientGUI extends JFrame{
 	}
 	
 	
+	/**
+	* 
+	*/
+	public void sendMessage(){
 	
+	}//end method: sendMessage
+	
+	
+	
+	public void addMessage(){
+	
+	}//end method: addMessage
+
 	
 	
 	
