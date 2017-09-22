@@ -87,7 +87,7 @@ public class ChatPanel{
 	*/
 	public JPanel getPanel(){
 		return this.wrapper;
-	}//get method: getPanel
+	}//end method: getPanel
 	
 	
 	/**

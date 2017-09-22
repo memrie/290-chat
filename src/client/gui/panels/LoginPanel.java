@@ -33,15 +33,15 @@ import javax.swing.UIManager;
 
 
 public class LoginPanel{
-
-	private Font genericTxt = new Font("Arial", Font.PLAIN, 16);
-	private Dimension lblUsernameSize = new Dimension(200,20);
-	private Dimension lblLoginSize = new Dimension(100,20);
+	//protocol? tcp is default
+	private String selected_method = "tcp";
 	
+	//the wrapper panels
 	private JPanel wrapper = new JPanel(new BorderLayout());
 	private JPanel user_prompt = new JPanel(new BorderLayout());
 	private JPanel connect_prompt = new JPanel(new BorderLayout());
 	
+	//wrapper panels for the controls (connection method, username
 	private JPanel username_panel = new JPanel(new FlowLayout());
 	private JPanel connect_panel = new JPanel(new FlowLayout());
 	private JPanel connect_option_panel = new JPanel(new BorderLayout());
@@ -51,18 +51,20 @@ public class LoginPanel{
 	private JPanel user_msg_container = new JPanel(new FlowLayout());
 	private JPanel method_msg_container = new JPanel(new FlowLayout());
 	
-	
-	private JLabel CHOOSE_MSG = new JLabel("<html><div style='padding-top:30px;text-align:center;font-size:14pt;font-weight:bold;'>please choose a username for this session</div>");
-	private JLabel USERNAME_LBL = new JLabel("username: ");
+	//username messages/inputs
+	private final JLabel CHOOSE_MSG = new JLabel("<html><div style='padding-top:30px;text-align:center;font-size:14pt;font-weight:bold;'>please choose a username for this session</div>");
+	private final JLabel USERNAME_LBL = new JLabel("username: ");
 	private JTextField user_name = new JTextField(20);
 	
+	//connection method messages/inputs
 	private final JLabel METHOD_MSG = new JLabel("<html><div style='padding-top:30px;text-align:center; font-size:14pt;font-weight:bold;'>method of connection</div>");
 	private JRadioButton tcp_ip = new JRadioButton("TCP/IP");
 	private JRadioButton udp = new JRadioButton("UDP");
 	
+	//button group for the radio buttons
 	private ButtonGroup method_group = new ButtonGroup();
 	
-	
+	//button for the user to actually connect to a server
 	private JButton connect_btn = new JButton("connect");
 	
 	/**
@@ -74,6 +76,23 @@ public class LoginPanel{
 		//add buttons to method radio group
 		this.method_group.add(tcp_ip);
 		this.method_group.add(udp);
+		
+		
+		//to avoid looping later, just update our attribute when the user clicks it
+		tcp_ip.addActionListener(//update to TCP/IP
+         new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+               selected_method = "tcp";
+            }//end action performed
+       });//end action listener
+		 
+		 udp.addActionListener(//update to UDP
+         new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+               selected_method = "udp";
+            }//end action performed
+       });//end action listener
+		
 		
 		//username: textfield add
 		this.username_panel.add(USERNAME_LBL);
@@ -110,8 +129,6 @@ public class LoginPanel{
 	}//end constructor
 	
 	
-	
-	
 	/** 
 	* Gives you the login panel
 	* @return JPanel the login panel
@@ -120,19 +137,28 @@ public class LoginPanel{
 		return this.wrapper;
 	}//end functoin: getPanel
 	
+	/**
+	* Gives you the connect button
+	* @return JButton the connect button
+	*/
 	public JButton getConnectButton(){
 		return this.connect_btn;
-	}
+	}//end method: getConnectButton
 	
-	
+	/**
+	* gives you the username they entered
+	* @return String the username they entered
+	*/
 	public String getUsername(){
-	
-		return "";
+		return this.user_name.getText();
 	}//end method: getUsername
 	
+	/**
+	* Gives you which server connection protocol they chose
+	* @return String the protocol chosen
+	*/
 	public String getMethod(){
-		
-		return "";
+		return this.selected_method;
 	}//end method: getMethod
 	
 }//end class: LoginPanel

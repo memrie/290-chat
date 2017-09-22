@@ -90,6 +90,7 @@ public class ClientGUI extends JFrame{
 	}//end constructor
 	
 	public Boolean connectToSocket(){
+		this.loginPanel.getMethod();
 		this.jf.remove(this.loginPanel.getPanel());
 		
 		this.jf.add(this.chatPanel.getPanel());
