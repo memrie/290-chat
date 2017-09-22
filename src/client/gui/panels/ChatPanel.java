@@ -39,8 +39,24 @@ import javax.swing.UIManager;
 */
 
 public class ChatPanel{
-
-
-
-
+	
+	
+	
+	
+	/**
+	* 
+	*/
+	public void sendMessage(){
+	
+	}//end method: sendMessage
+	
+	
+	
+	public void addMessage(){
+	
+	}//end method: addMessage
+	
+	
+	
+	
 }//end class: ChatPanel

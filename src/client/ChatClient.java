@@ -15,5 +15,4 @@ public class ChatClient{
 		ClientGUI gui_client = new ClientGUI();
 	}//end main method
 
-
 }//end class: ChatClient

@@ -68,7 +68,7 @@ public class ClientGUI extends JFrame{
 		this.chatPanel = new ChatPanel();
 	
 	  	//////////////////// Lets get the program up for the first time
-      jf.add(BorderLayout.PAGE_START, this.menuBar.getMenubar());//menu bar
+     // jf.add(BorderLayout.PAGE_START, this.menuBar.getMenubar());//menu bar
       jf.add(this.loginPanel.getPanel());//login panel
    	
    	
