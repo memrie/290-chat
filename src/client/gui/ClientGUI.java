@@ -73,7 +73,7 @@ public class ClientGUI extends JFrame{
    	
    	
    	
-      	//////////////////// Show it to the user
+      //////////////////// Show it to the user
       jf.setVisible(true); // display jf
       jf.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); //close by default
 		
@@ -82,41 +82,82 @@ public class ClientGUI extends JFrame{
          new ActionListener(){
             public void actionPerformed(ActionEvent e){
                
-					connectToSocket();
+					if(connectToSocket()){
+						//we're good - unload login panel, show chat
+						unloadLoginPanel();
+					}else{
+						//um... that ain't right. show an error message
+					}//end else/if: could we connect to the chosen server?
 					
             }//end action performed
       });//end action listener
 	
 	}//end constructor
 	
+	
+	/**
+	*	attempts to connect the user to their given sever
+	* @return Boolean whether or not we could connect
+	*/
 	public Boolean connectToSocket(){
-		this.loginPanel.getMethod();
-		this.jf.remove(this.loginPanel.getPanel());
+		String protocol_method = this.loginPanel.getMethod();
 		
-		this.jf.add(this.chatPanel.getPanel());
+		//based on connection, the server should make sure only 1
+		//user has their username, otherwise prepend a numeric number
+		//to diferentate the users. Server should return that username 
+		//back to me, the client to update that username
+		switch(protocol_method){
+			case "udp" : 
+				//connect to UDP
+				break;
+			default :
+				//assume TCP/IP
+				break;
+		}//end switch: which protocol?
 		
-		this.jf.revalidate();
-      this.jf.repaint();
-      pack();		
 		return true;
-	}
+	}//end method: connectToSocket
+	
 	
 	
 	/**
-	* 
+	* removes the login panel and shows the chat panel to the user
+	*/
+	public void unloadLoginPanel(){
+		this.chat_user = this.loginPanel.getUsername();
+	
+		//remove the initial panel
+		this.jf.remove(this.loginPanel.getPanel());
+		
+		//load up the chat panel
+		this.jf.add(this.chatPanel.getPanel());
+		
+		//redraw the panel so it updates
+		this.jf.revalidate();
+      this.jf.repaint();
+      pack();
+	}//end method: unloadLoginPanel
+	
+	
+	
+	
+	/**
+	* make a call to the server via the open socket
 	*/
 	public void sendMessage(){
-	
+		//build out the message, with the username this user has chosen
+		String msg = this.chat_user  + ": " + this.chatPanel.getMessage();
+		//send message
 	}//end method: sendMessage
 	
 	
-	
-	public void addMessage(){
-	
+	/**
+	* add the message to the chat panel, it was recieved
+	*/
+	public void addMessage(String msg){
+		//we need to base this on the socket events, method will be changed later.
+		this.chatPanel.updateMessagesList(msg);
 	}//end method: addMessage
 
 	
-	
-	
-
 }//end class: ClientGUI
