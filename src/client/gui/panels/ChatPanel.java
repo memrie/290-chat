@@ -1,6 +1,6 @@
 
 /////////////// Directory
-package gui.panels;
+package client.gui.panels;
 
 /////////////// Event Libraries         
 import java.awt.*;

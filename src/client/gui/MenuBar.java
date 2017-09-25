@@ -1,7 +1,7 @@
 
 
 /////////////// directory
-package gui;
+package client.gui;
 
 /////////////// Event Libraries         
 import java.awt.*;

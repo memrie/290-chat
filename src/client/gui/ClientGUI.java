@@ -1,33 +1,19 @@
 /////////////// Directory
-package gui;
+package client.gui;
 
 /////////////// project libraries
-import gui.panels.*;
+import client.gui.panels.ChatPanel;
+import client.gui.panels.LoginPanel;
 
-/////////////// Event Libraries         
+import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-/////////////// 
-import java.util.*;
-import java.time.*;
-import java.text.*;
-
+/////////////// Event Libraries
+///////////////
 /////////////// General Java Libraries
-import java.util.*;
-import java.io.*;
-
 ////////////// GUI Libraries
-import javax.swing.*; 
-import javax.swing.plaf.metal.*;
-import javax.swing.border.*;
-import javax.swing.DefaultCellEditor;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.UIManager;
 
 
 /*******************************************************************************

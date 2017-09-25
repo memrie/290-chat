@@ -1,5 +1,7 @@
+package client;
+
 /////////////// project libraries
-import gui.*;
+import client.gui.*;
 
 
 /*******************************************************************************

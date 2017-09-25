@@ -1,5 +1,5 @@
 /////////////// Directory
-package gui.panels;
+package client.gui.panels;
 
 
 /////////////// Event Libraries         
