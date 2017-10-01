@@ -9,6 +9,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 /////////////// Event Libraries
 ///////////////
@@ -147,3 +150,51 @@ public class ClientGUI extends JFrame{
 
 	
 }//end class: ClientGUI
+
+/** Create a class SendHandler */
+class SendHandler implements ActionListener, Runnable{
+	private JTextArea jtaMain;
+	private JTextField jtfMessage;
+	private Socket cs;
+	private BufferedReader br;
+	private PrintWriter pw;
+
+	/** SendHandler Constructor */
+	public SendHandler(JTextArea jtaMain, JTextField jtfMessage){
+		this.jtaMain = jtaMain;
+		this.jtfMessage = jtfMessage;
+
+		try{
+			cs = new Socket(ip, 16789);
+			br = new BufferedReader( new InputStreamReader( cs.getInputStream()));
+			pw = new PrintWriter( new OutputStreamWriter( cs.getOutputStream()));
+		}
+		catch(UnknownHostException uhe){
+			jtaMain.append("There is no server available");
+			System.out.println("UnknownHostException | SendHandler");
+		}// end of the catch
+		catch(IOException ie){
+			System.out.println("IOException | SendHandler");
+		}//end of IO catch
+	}//end of constructor
+
+	public void actionPerformed(ActionEvent ae){
+		//Sending jtaMessage to server
+		String message = jtfMessage.getText();
+		pw.println(message);
+		pw.flush();
+	}//end of ActionPerformed
+
+	public void run(){
+		try{
+			while(true){
+				String line = br.readLine();
+				jtaMain.append(line + "\n");
+			}
+		}
+		catch(IOException ie){
+			jtaMain.append("The server has been disconnected - you can no longer chat.");
+			System.out.println("IOException | actionperformed");
+		}
+	} // end run
+}//end of SendHandler

@@ -2,10 +2,12 @@
 package server.servers;
 
 import java.io.*;
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Enumeration;
 import java.util.Vector;
-
+import java.net.InetAddress;
 /**
 * @desc        This is the server which uses the TCP/IP protocol specifically.
 *
@@ -17,43 +19,44 @@ import java.util.Vector;
 public class TCPServer{
     private ServerSocket ss;
     private Vector<PrintWriter> pwList = new Vector<PrintWriter>();
+    private Enumeration<NetworkInterface> addresses;
 
-    /** Creates a MyServer object */
-    public static void main(String[]args){
-        new TCPServer();
-    }//end of main
-
-    /** MyServer Constructor
+    /** TCPServer Constructor
      *  Creates threads from inner class
      *  to handle multiple clients
      */
     public TCPServer(){
         try{
-            ss = new ServerSocket(16789);
+            InetAddress ip = InetAddress.getLocalHost();
+            System.out.println("Listening on IP: " + ip.getHostAddress());
+
+            // port 0 checks for open ports
+            ss = new ServerSocket(0);
+            System.out.println("Listening on port: " + ss.getLocalPort());
 
             while(true){
-                System.out.println("Waiting for Client...");
+                System.out.println("Waiting for Clients...");
                 Socket cs = ss.accept();
                 System.out.println("Found a Client!");
 
                 //new thread to handle the client
-                ThreadedServer ts = new ThreadedServer(cs);
+                TCPClientHandler ts = new TCPClientHandler(cs);
                 ts.start();
             } // end loop
         }
         catch(IOException ie){
-            System.out.println("IOException | MyServer");
+            System.out.println("IOException | TCPServer constructor");
         }
     }
 
     /** handles multiple clients */
-    class ThreadedServer extends Thread{
+    class TCPClientHandler extends Thread{
         private Socket cs;
         private PrintWriter pw;
         private BufferedReader br;
 
         /** ThreadedServer constructor */
-        public ThreadedServer(Socket cs){
+        public TCPClientHandler(Socket cs){
             this.cs = cs;
         }// end constructor
 
