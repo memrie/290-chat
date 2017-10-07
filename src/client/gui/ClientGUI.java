@@ -151,6 +151,9 @@ public class ClientGUI extends JFrame{
 	
 }//end class: ClientGUI
 
+
+// This is the send handler that I used for the TCP homework.
+// It can be modified to be used for this TCP/IP server - kristen
 /** Create a class SendHandler */
 class SendHandler implements ActionListener, Runnable{
 	private JTextArea jtaMain;
