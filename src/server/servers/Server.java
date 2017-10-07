@@ -1,6 +1,6 @@
 package server.servers;
 
 public interface Server {
-    public boolean startServer();
-    public boolean stopServer();
+    public void startServer();
+    public void stopServer();
 }

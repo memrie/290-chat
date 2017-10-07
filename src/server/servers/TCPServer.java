@@ -2,12 +2,11 @@
 package server.servers;
 
 import java.io.*;
-import java.net.NetworkInterface;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Enumeration;
+import java.net.UnknownHostException;
 import java.util.Vector;
-import java.net.InetAddress;
 /**
 * @desc        This is the server which uses the TCP/IP protocol specifically.
 *
@@ -16,10 +15,11 @@ import java.net.InetAddress;
 */
 
 
-public class TCPServer{
+public class TCPServer implements Server{
     private ServerSocket ss;
+    private InetAddress ip;
     private Vector<PrintWriter> pwList = new Vector<PrintWriter>();
-    private Enumeration<NetworkInterface> addresses;
+    private boolean runServer;
 
     /** TCPServer Constructor
      *  Creates threads from inner class
@@ -27,26 +27,43 @@ public class TCPServer{
      */
     public TCPServer(){
         try{
-            InetAddress ip = InetAddress.getLocalHost();
+            ip = InetAddress.getLocalHost();
             System.out.println("Listening on IP: " + ip.getHostAddress());
-
-            // port 0 checks for open ports
-            ss = new ServerSocket(0);
+            ss = new ServerSocket(0); // port 0 checks for open ports
             System.out.println("Listening on port: " + ss.getLocalPort());
+            runServer = true;
+            startServer();
+        }
+        catch(UnknownHostException uh){
+            System.out.println("UnknownHostException | TCPServer constructor");
+            System.out.println(uh.getMessage());
+        }
+        catch(Exception e){
+            System.out.println("Exception | TCPServer constructor");
+            System.out.println(e.getMessage());
+        }
+    }
 
-            while(true){
-                System.out.println("Waiting for Clients...");
+    public void startServer(){
+        try {
+            while(runServer){
+                System.out.println("Waiting for new client...");
                 Socket cs = ss.accept();
-                System.out.println("Found a Client!");
+                System.out.println("Found a client!");
 
                 //new thread to handle the client
                 TCPClientHandler ts = new TCPClientHandler(cs);
                 ts.start();
             } // end loop
         }
-        catch(IOException ie){
-            System.out.println("IOException | TCPServer constructor");
+        catch(IOException io){
+            System.out.println("IOException | TCP | startServer");
+            System.out.println(io.getMessage());
         }
+    }
+
+    public void stopServer(){
+        runServer = false;
     }
 
     /** handles multiple clients */
@@ -75,7 +92,7 @@ public class TCPServer{
                 br = new BufferedReader( new InputStreamReader( cs.getInputStream()));
 
                 //String clientMsg;
-                while(true){
+                while(runServer){
                     System.out.println("Waiting for msg...");
                     String clientMsg = br.readLine();
                     System.out.println(clientMsg);
