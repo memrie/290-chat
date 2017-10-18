@@ -5,15 +5,24 @@ package client.gui;
 import client.gui.panels.ChatPanel;
 import client.gui.panels.LoginPanel;
 
+/////////////// General Java Libraries
+import java.util.*;
+
+/////////////// Socket Handling Libraries (TCP/IP)
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.io.*;
+
+////////////// GUI Libraries
 import javax.swing.*;
+
+
+/////////////// Event Libraries
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-/////////////// Event Libraries
-///////////////
-/////////////// General Java Libraries
-////////////// GUI Libraries
 
 
 /*******************************************************************************
@@ -34,6 +43,12 @@ public class ClientGUI extends JFrame{
    private MenuBar menuBar;
    private LoginPanel loginPanel;
 	private ChatPanel chatPanel;
+	
+	//TCP/IP Specific
+	private Socket socket;
+	private BufferedReader br;
+	private PrintWriter pw;
+
 	
 	
 	/**
@@ -63,7 +78,7 @@ public class ClientGUI extends JFrame{
       jf.setVisible(true); // display jf
       jf.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); //close by default
 		
-		
+		//////////// Attach the conect event to the button
 		loginPanel.getConnectButton().addActionListener(
          new ActionListener(){
             public void actionPerformed(ActionEvent e){
@@ -77,6 +92,18 @@ public class ClientGUI extends JFrame{
 					
             }//end action performed
       });//end action listener
+		
+		
+		////////// Attach the send message event to the button
+		chatPanel.getSendButton().addActionListener(
+         new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+               
+					sendMessage();
+					
+            }//end action performed
+      });//end action listener
+		
 	
 	}//end constructor
 	
@@ -98,12 +125,54 @@ public class ClientGUI extends JFrame{
 				break;
 			default :
 				//assume TCP/IP
+				connectToTCP();
 				break;
 		}//end switch: which protocol?
 		
 		return true;
 	}//end method: connectToSocket
 	
+	
+	public void connectToTCP(){
+		try{
+			this.socket = new Socket(loginPanel.getIPAddress(), loginPanel.getPort());
+			this.br = new BufferedReader( new InputStreamReader( this.socket.getInputStream()));
+			this.pw = new PrintWriter( new OutputStreamWriter( this.socket.getOutputStream()));
+			
+			while(br.readLine()){
+			String line = br.readLine();
+				chatPanel.updateMessagesList(line);
+			}
+			//runTCP();
+		}catch(UnknownHostException uhe){
+			//jtaMain.append("There is no server available");
+			System.out.println("UnknownHostException | SendHandler");
+		}// end of the catch: UnknownHost
+		catch(IOException ie){
+			System.out.println("IOException --> on connection");
+		}catch(NullPointerException ne){
+			System.out.println("Null pointer - couldn't connect");
+		}catch(Exception e){
+			System.out.println("General Exception - issue");
+		}//end of IO catch
+
+	}//end method: connectToTCP
+	
+	
+	public void runTCP(){
+		try{
+			while(true){
+			String line = br.readLine();
+				chatPanel.updateMessagesList(line);
+			}//end while
+		}catch(IOException ie){
+			chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
+		}catch(NullPointerException ne){
+			chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
+		}catch(Exception e){
+			chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
+		}//end try/catch
+	} // end method: run
 	
 	
 	/**
@@ -134,6 +203,10 @@ public class ClientGUI extends JFrame{
 		//build out the message, with the username this user has chosen
 		String msg = this.chat_user  + ": " + this.chatPanel.getMessage();
 		//send message
+		
+		pw.println(msg);
+		pw.flush();
+		this.chatPanel.clearMessage();
 	}//end method: sendMessage
 	
 	

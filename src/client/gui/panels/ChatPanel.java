@@ -89,6 +89,9 @@ public class ChatPanel{
 		return this.wrapper;
 	}//end method: getPanel
 	
+	public JButton getSendButton(){
+		return this.sendMessage;
+	}
 	
 	/**
 	* get the message the user wants to send
@@ -105,6 +108,10 @@ public class ChatPanel{
 	public void updateMessagesList(String msg){
 		this.messagesList.append(msg);
 	}//end method: updateMessagesList
+	
+	public void clearMessage(){
+		this.yourMessageTxt.setText("");
+	}
 	
 	
 }//end class: ChatPanel

@@ -45,6 +45,7 @@ public class LoginPanel{
 	private JPanel username_panel = new JPanel(new FlowLayout());
 	private JPanel connect_panel = new JPanel(new FlowLayout());
 	private JPanel connect_option_panel = new JPanel(new BorderLayout());
+	private JPanel connect_option_tcp_panel = new JPanel(new BorderLayout());
 	
 	//flow layouts to make elements center and format/not take up entire window
 	private JPanel btn_container = new JPanel(new FlowLayout());
@@ -63,6 +64,14 @@ public class LoginPanel{
 	
 	//button group for the radio buttons
 	private ButtonGroup method_group = new ButtonGroup();
+	
+	//IP and Port
+	private JPanel tcp_ip_port_panel = new JPanel(new FlowLayout());
+	private final JLabel ip_lbl = new JLabel("ip address: ");
+	private JTextField ip_txt = new JTextField(10);
+	
+	private final JLabel port_lbl = new JLabel("port: ");
+	private JTextField port_txt = new JTextField(5);
 	
 	//button for the user to actually connect to a server
 	private JButton connect_btn = new JButton("connect");
@@ -83,6 +92,7 @@ public class LoginPanel{
          new ActionListener(){
             public void actionPerformed(ActionEvent e){
                selected_method = "tcp";
+					tcp_ip_port_panel.setVisible(true);
             }//end action performed
        });//end action listener
 		 
@@ -90,6 +100,7 @@ public class LoginPanel{
          new ActionListener(){
             public void actionPerformed(ActionEvent e){
                selected_method = "udp";
+					tcp_ip_port_panel.setVisible(false);
             }//end action performed
        });//end action listener
 		
@@ -109,6 +120,17 @@ public class LoginPanel{
 		this.connect_panel.add(udp);
 		connect_panel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		
+		//tcp/ip - obtain IP/port information
+		this.tcp_ip_port_panel.add(this.ip_lbl);
+		this.tcp_ip_port_panel.add(this.ip_txt);
+		
+		this.tcp_ip_port_panel.add(this.port_lbl);
+		this.tcp_ip_port_panel.add(this.port_txt);
+		
+		this.connect_option_tcp_panel.add(this.connect_option_panel, BorderLayout.NORTH);
+		this.connect_option_tcp_panel.add(this.tcp_ip_port_panel, BorderLayout.CENTER);
+		this.tcp_ip_port_panel.setVisible(false);
+		
 		//add method message to panel
 		method_msg_container.add(METHOD_MSG);
 		this.connect_option_panel.add(method_msg_container, BorderLayout.CENTER);
@@ -118,7 +140,7 @@ public class LoginPanel{
 		this.btn_container.add(connect_btn);
 		
 		//add two main connection method panels to their wrapper
-		this.connect_prompt.add(connect_option_panel, BorderLayout.NORTH);
+		this.connect_prompt.add(connect_option_tcp_panel, BorderLayout.NORTH);
 		this.connect_prompt.add(btn_container,BorderLayout.CENTER);
 
 		
@@ -161,4 +183,31 @@ public class LoginPanel{
 		return this.selected_method;
 	}//end method: getMethod
 	
+	/**
+	* Gives you the IP Address the user wants to connect to
+	* @return String the IP Address 
+	*/
+	public String getIPAddress(){
+		String ip_address = null;
+		
+		if(selected_method == "tcp"){
+			ip_address = this.ip_txt.getText();
+		}//end if: is this tcp/ip?
+		
+		return ip_address;
+	}//end method: getIPAddress
+	
+	/**
+	* Gives you which port the user wants to listen on
+	* @return String the port 
+	*/
+	public int getPort(){
+		int port_num = 0;//they can't have a port, random one
+		if(selected_method == "tcp"){
+			port_num = Integer.parseInt(this.port_txt.getText());
+		}//end if: is this tcp/ip?
+		return port_num;
+	}//end method: getIPAddress
+	
+		
 }//end class: LoginPanel
