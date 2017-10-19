@@ -98,7 +98,6 @@ public class ClientGUI extends JFrame{
 		chatPanel.getSendButton().addActionListener(
          new ActionListener(){
             public void actionPerformed(ActionEvent e){
-               
 					sendMessage();
 					
             }//end action performed
@@ -125,7 +124,7 @@ public class ClientGUI extends JFrame{
 				break;
 			default :
 				//assume TCP/IP
-				connectToTCP();
+				this.connectToTCP();
 				break;
 		}//end switch: which protocol?
 		
@@ -133,17 +132,12 @@ public class ClientGUI extends JFrame{
 	}//end method: connectToSocket
 	
 	
+	
 	public void connectToTCP(){
 		try{
-			this.socket = new Socket(loginPanel.getIPAddress(), loginPanel.getPort());
-			this.br = new BufferedReader( new InputStreamReader( this.socket.getInputStream()));
-			this.pw = new PrintWriter( new OutputStreamWriter( this.socket.getOutputStream()));
-			
-			while(br.readLine()){
-			String line = br.readLine();
-				chatPanel.updateMessagesList(line);
-			}
-			//runTCP();
+			socket = new Socket(loginPanel.getIPAddress(), loginPanel.getPort());
+			br = new BufferedReader( new InputStreamReader( this.socket.getInputStream()));
+			pw = new PrintWriter( new OutputStreamWriter( this.socket.getOutputStream()));
 		}catch(UnknownHostException uhe){
 			//jtaMain.append("There is no server available");
 			System.out.println("UnknownHostException | SendHandler");
@@ -159,21 +153,24 @@ public class ClientGUI extends JFrame{
 	}//end method: connectToTCP
 	
 	
-	public void runTCP(){
-		try{
-			while(true){
-			String line = br.readLine();
-				chatPanel.updateMessagesList(line);
-			}//end while
-		}catch(IOException ie){
-			chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
-		}catch(NullPointerException ne){
-			chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
-		}catch(Exception e){
-			chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
-		}//end try/catch
-	} // end method: run
 	
+	
+	class SendHandler implements Runnable{
+		public void run(){
+			try{
+				while(true){
+					String line = br.readLine();
+					chatPanel.updateMessagesList(line);
+				}//end while
+			}catch(IOException ie){
+				chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
+			}catch(NullPointerException ne){
+				chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
+			}catch(Exception e){
+				chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
+			}//end try/catch
+		} // end method: run
+	}
 	
 	/**
 	* removes the login panel and shows the chat panel to the user
@@ -204,8 +201,11 @@ public class ClientGUI extends JFrame{
 		String msg = this.chat_user  + ": " + this.chatPanel.getMessage();
 		//send message
 		
+		///
 		pw.println(msg);
 		pw.flush();
+		
+		
 		this.chatPanel.clearMessage();
 	}//end method: sendMessage
 	
