@@ -7,6 +7,7 @@ import client.gui.panels.LoginPanel;
 
 /////////////// General Java Libraries
 import java.util.*;
+import java.text.*;
 
 /////////////// Socket Handling Libraries (TCP/IP)
 import java.net.ServerSocket;
@@ -138,6 +139,26 @@ public class ClientGUI extends JFrame{
 			socket = new Socket(loginPanel.getIPAddress(), loginPanel.getPort());
 			br = new BufferedReader( new InputStreamReader( this.socket.getInputStream()));
 			pw = new PrintWriter( new OutputStreamWriter( this.socket.getOutputStream()));
+			
+			Runnable run = new Runnable() {
+		   public void run() {
+				try{
+					while(true){
+						String line = br.readLine();
+						chatPanel.updateMessagesList(line);
+					}//end while
+				}catch(IOException ie){
+					chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
+				}catch(NullPointerException ne){
+					chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
+				}catch(Exception e){
+					chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
+				}//end try/catch
+		    }
+		 };
+		 new Thread(run).start();
+			
+			
 		}catch(UnknownHostException uhe){
 			//jtaMain.append("There is no server available");
 			System.out.println("UnknownHostException | SendHandler");
@@ -151,26 +172,7 @@ public class ClientGUI extends JFrame{
 		}//end of IO catch
 
 	}//end method: connectToTCP
-	
-	
-	
-	
-	class SendHandler implements Runnable{
-		public void run(){
-			try{
-				while(true){
-					String line = br.readLine();
-					chatPanel.updateMessagesList(line);
-				}//end while
-			}catch(IOException ie){
-				chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
-			}catch(NullPointerException ne){
-				chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
-			}catch(Exception e){
-				chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
-			}//end try/catch
-		} // end method: run
-	}
+
 	
 	/**
 	* removes the login panel and shows the chat panel to the user
@@ -197,8 +199,12 @@ public class ClientGUI extends JFrame{
 	* make a call to the server via the open socket
 	*/
 	public void sendMessage(){
+		DateFormat dateFormat = new SimpleDateFormat("MM/dd HH:mm:ss");
+		//get current date time with Date()
+		Date date = new Date();
+				
 		//build out the message, with the username this user has chosen
-		String msg = this.chat_user  + ": " + this.chatPanel.getMessage();
+		String msg = " \n" + this.chat_user  + " [" + dateFormat.format(date) + "] : " + this.chatPanel.getMessage();
 		//send message
 		
 		///

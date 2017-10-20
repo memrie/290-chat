@@ -66,6 +66,7 @@ public class ChatPanel{
 		
 		//don't let them edit the messageList
 		this.messagesList.setEnabled(false);
+		this.messagesList.setDisabledTextColor(Color.BLACK);
 		
 		//add button to it's container (border layout to take up width)
 		button_container.add(sendMessage, BorderLayout.NORTH);
