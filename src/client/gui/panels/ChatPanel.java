@@ -11,6 +11,7 @@ import java.util.*;
 import java.io.*;
 import java.time.*;
 import java.text.*;
+import javax.swing.text.DefaultCaret;
 
 ////////////// GUI Libraries
 import javax.swing.*; 
@@ -68,6 +69,8 @@ public class ChatPanel{
 		this.messagesList.setEnabled(false);
 		this.messagesList.setDisabledTextColor(Color.BLACK);
 		this.messagesList.setLineWrap(true);
+		DefaultCaret caret = (DefaultCaret) messagesList.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		
 		//add button to it's container (border layout to take up width)
 		button_container.add(sendMessage, BorderLayout.NORTH);
@@ -109,6 +112,7 @@ public class ChatPanel{
 	*/
 	public void updateMessagesList(String msg){
 		this.messagesList.append("\n" + msg);
+		this.yourMessageTxt.requestFocus();
 	}//end method: updateMessagesList
 	
 	public void clearMessage(){
