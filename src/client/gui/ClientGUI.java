@@ -204,7 +204,7 @@ public class ClientGUI extends JFrame{
 		Date date = new Date();
 				
 		//build out the message, with the username this user has chosen
-		String msg = " \n" + this.chat_user  + " [" + dateFormat.format(date) + "] : " + this.chatPanel.getMessage();
+		String msg = this.chat_user  + " [" + dateFormat.format(date) + "] : " + this.chatPanel.getMessage();
 		//send message
 		
 		///

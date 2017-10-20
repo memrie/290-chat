@@ -67,6 +67,7 @@ public class ChatPanel{
 		//don't let them edit the messageList
 		this.messagesList.setEnabled(false);
 		this.messagesList.setDisabledTextColor(Color.BLACK);
+		this.messagesList.setLineWrap(true);
 		
 		//add button to it's container (border layout to take up width)
 		button_container.add(sendMessage, BorderLayout.NORTH);
@@ -107,7 +108,7 @@ public class ChatPanel{
 	* @param String the message to add
 	*/
 	public void updateMessagesList(String msg){
-		this.messagesList.append(msg);
+		this.messagesList.append("\n" + msg);
 	}//end method: updateMessagesList
 	
 	public void clearMessage(){
