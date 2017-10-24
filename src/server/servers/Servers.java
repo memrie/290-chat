@@ -15,8 +15,8 @@ public static void main(String[] args) {
     // Start TCP Server
     TCPServer tcp = new TCPServer();
 
-
-    // Start UDP Server
+    // Start UDP Server -- UDP server will only start if TCP is not started
+    UDPServer udp = new UDPServer();
 
 }
 }//end class: Server
