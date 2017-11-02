@@ -16,6 +16,12 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.io.*;
 
+
+/////////////// UDP Handling Libraries
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+//import java.util.Scanner;
+
 ////////////// GUI Libraries
 import javax.swing.*;
 
@@ -37,6 +43,7 @@ import java.awt.event.ActionListener;
 
 public class ClientGUI extends JFrame{
 	private String chat_user = "";
+	private String protocol_method;
 	
 	private JFrame jf = new JFrame("Chat Client - NSSA 290"); //main frame
    
@@ -49,7 +56,14 @@ public class ClientGUI extends JFrame{
 	private Socket socket;
 	private BufferedReader br;
 	private PrintWriter pw;
-
+	
+	//UDP Specific
+	private int port;
+	private Scanner sc;
+   private DatagramSocket ds = null;
+   private InetAddress ip;
+   byte[] buf = null;
+	DatagramPacket packet;
 	
 	
 	/**
@@ -113,7 +127,7 @@ public class ClientGUI extends JFrame{
 	* @return Boolean whether or not we could connect
 	*/
 	public Boolean connectToSocket(){
-		String protocol_method = this.loginPanel.getMethod();
+		this.protocol_method = this.loginPanel.getMethod();
 		
 		//based on connection, the server should make sure only 1
 		//user has their username, otherwise prepend a numeric number
@@ -122,6 +136,7 @@ public class ClientGUI extends JFrame{
 		switch(protocol_method){
 			case "udp" : 
 				//connect to UDP
+				this.connectToUDP();
 				break;
 			default :
 				//assume TCP/IP
@@ -132,6 +147,47 @@ public class ClientGUI extends JFrame{
 		return true;
 	}//end method: connectToSocket
 	
+	
+	public void connectToUDP(){
+		System.out.println("in connectUDP");
+		try{
+			sc = new Scanner(System.in);
+		   ds = new DatagramSocket();
+		  	this.ip = InetAddress.getLocalHost();
+			byte[] receiveData = new byte[1024];
+			System.out.println(ip);
+		   
+			
+			Runnable run = new Runnable() {
+			   public void run() {
+					while (true){
+						//DatagramPacket packet = new DatagramPacket(buf, bug.length, ip, 4444);
+						
+						try{
+							 DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+						      ds.receive(receivePacket);
+						      String modifiedSentence = new String(receivePacket.getData());
+						      System.out.println("FROM SERVER:" + modifiedSentence);
+						}catch(IOException ioe){
+							System.out.println("fuckyou");
+						}
+					}
+					
+			   }
+			 };
+			 new Thread(run).start();
+
+		}catch(UnknownHostException uhe){
+			System.out.println("can't find ya...");
+		}catch(IOException ie){
+			chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
+		}catch(NullPointerException ne){
+			chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
+		}catch(Exception e){
+			chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
+		}//end try/catch
+	
+	}//end method: connectUDP
 	
 	
 	public void connectToTCP(){
@@ -207,10 +263,29 @@ public class ClientGUI extends JFrame{
 		String msg = this.chat_user  + " [" + dateFormat.format(date) + "] : " + this.chatPanel.getMessage();
 		//send message
 		
-		///
-		pw.println(msg);
-		pw.flush();
-		
+		switch(this.protocol_method){
+			case "udp":
+				try{
+					buf = msg.getBytes();
+			      DatagramPacket sendPacket = new DatagramPacket(buf, buf.length, ip,1222);
+			      ds.send(sendPacket);
+			
+					
+					System.out.println(buf);
+					System.out.println(ip);
+					System.out.println(buf.length);
+					
+				}catch(Exception ioe){
+					System.out.println("There was an issue with UDP...");
+					ioe.printStackTrace();
+					
+				}//end try/catch
+				break;
+			default:
+				pw.println(msg);
+				pw.flush();
+				break;
+		}//end switch: which protocol method?
 		
 		this.chatPanel.clearMessage();
 	}//end method: sendMessage
@@ -226,54 +301,3 @@ public class ClientGUI extends JFrame{
 
 	
 }//end class: ClientGUI
-
-
-// This is the send handler that I used for the TCP homework.
-// It can be modified to be used for this TCP/IP server - kristen
-///** Create a class SendHandler */
-//class SendHandler implements ActionListener, Runnable{
-//	private JTextArea jtaMain;
-//	private JTextField jtfMessage;
-//	private Socket cs;
-//	private BufferedReader br;
-//	private PrintWriter pw;
-//
-//	/** SendHandler Constructor */
-//	public SendHandler(JTextArea jtaMain, JTextField jtfMessage){
-//		this.jtaMain = jtaMain;
-//		this.jtfMessage = jtfMessage;
-//
-//		try{
-//			cs = new Socket(ip, 16789);
-//			br = new BufferedReader( new InputStreamReader( cs.getInputStream()));
-//			pw = new PrintWriter( new OutputStreamWriter( cs.getOutputStream()));
-//		}
-//		catch(UnknownHostException uhe){
-//			jtaMain.append("There is no server available");
-//			System.out.println("UnknownHostException | SendHandler");
-//		}// end of the catch
-//		catch(IOException ie){
-//			System.out.println("IOException | SendHandler");
-//		}//end of IO catch
-//	}//end of constructor
-//
-//	public void actionPerformed(ActionEvent ae){
-//		//Sending jtaMessage to server
-//		String message = jtfMessage.getText();
-//		pw.println(message);
-//		pw.flush();
-//	}//end of ActionPerformed
-//
-//	public void run(){
-//		try{
-//			while(true){
-//				String line = br.readLine();
-//				jtaMain.append(line + "\n");
-//			}
-//		}
-//		catch(IOException ie){
-//			jtaMain.append("The server has been disconnected - you can no longer chat.");
-//			System.out.println("IOException | actionperformed");
-//		}
-//	} // end run
-//}//end of SendHandler
