@@ -65,6 +65,11 @@ public class ClientGUI extends JFrame{
    byte[] buf = null;
 	DatagramPacket packet;
 	
+	DatagramSocket clientSocket;
+   InetAddress IPAddress;
+   byte[] sendData = new byte[1024];
+   byte[] receiveData = new byte[1024];
+	
 	
 	/**
 	* @CONSTRUCTOR
@@ -147,27 +152,36 @@ public class ClientGUI extends JFrame{
 		return true;
 	}//end method: connectToSocket
 	
+	/**
+	* Utility function from: https://goo.gl/GQ3fR7
+	* 
+	*/
+	static byte[] trim(byte[] bytes){
+		int i = bytes.length - 1;
+		while (i >= 0 && bytes[i] == 0){
+			--i;
+		}
+
+		return Arrays.copyOf(bytes, i + 1);
+	}//end method: trim
+	
 	
 	public void connectToUDP(){
-		System.out.println("in connectUDP");
 		try{
-			sc = new Scanner(System.in);
-		   ds = new DatagramSocket();
+			clientSocket = new DatagramSocket();
+			IPAddress = InetAddress.getByName("localhost");
 		  	this.ip = InetAddress.getLocalHost();
 			byte[] receiveData = new byte[1024];
-			System.out.println(ip);
-		   
-			
+
 			Runnable run = new Runnable() {
 			   public void run() {
 					while (true){
-						//DatagramPacket packet = new DatagramPacket(buf, bug.length, ip, 4444);
-						
 						try{
-							 DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-						      ds.receive(receivePacket);
-						      String modifiedSentence = new String(receivePacket.getData());
-						      System.out.println("FROM SERVER:" + modifiedSentence);
+							DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+					      clientSocket.receive(receivePacket);
+					      String modifiedSentence = new String(trim(receivePacket.getData()));
+							chatPanel.updateMessagesList(modifiedSentence);
+							
 						}catch(IOException ioe){
 							System.out.println("fuckyou");
 						}
@@ -266,15 +280,12 @@ public class ClientGUI extends JFrame{
 		switch(this.protocol_method){
 			case "udp":
 				try{
-					buf = msg.getBytes();
-			      DatagramPacket sendPacket = new DatagramPacket(buf, buf.length, ip,1222);
-			      ds.send(sendPacket);
-			
-					
-					System.out.println(buf);
-					System.out.println(ip);
-					System.out.println(buf.length);
-					
+					//BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
+			      
+			      //String sentence = inFromUser.readLine();
+			      sendData = msg.getBytes();
+			      DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
+			      clientSocket.send(sendPacket);					
 				}catch(Exception ioe){
 					System.out.println("There was an issue with UDP...");
 					ioe.printStackTrace();

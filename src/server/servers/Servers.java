@@ -12,7 +12,7 @@ public class Servers {
 
    public static void main(String[] args) {
        // Start TCP Server
-       TCPServer tcp = new TCPServer();
+       //TCPServer tcp = new TCPServer();
    
        // Start UDP Server -- UDP serve will only start if TCP is not started
        UDPServer udp = new UDPServer();
