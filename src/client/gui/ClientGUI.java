@@ -171,12 +171,13 @@ public class ClientGUI extends JFrame{
 			clientSocket = new DatagramSocket();
 			IPAddress = InetAddress.getByName("localhost");
 		  	this.ip = InetAddress.getLocalHost();
-			byte[] receiveData = new byte[1024];
+			//byte[] receiveData = new byte[1024];
 
 			Runnable run = new Runnable() {
 			   public void run() {
 					while (true){
 						try{
+							receiveData = new byte[1024];
 							DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 					      clientSocket.receive(receivePacket);
 					      String modifiedSentence = new String(trim(receivePacket.getData()));
