@@ -20,29 +20,53 @@ public class UDPServer extends Thread implements Server{
 	DatagramPacket sendPacket;
 	byte[] receiveData = new byte[1024];
 	byte[] sendData = new byte[1024];
+	
+	ArrayList<DatagramSocket> users = new ArrayList<DatagramSocket>();
   
 	public UDPServer(){
 		this.start();
 	}
 	
-	public void run(){
+	
+	public void broadcast(DatagramPacket dp){
 		try{
-			this.ds = new DatagramSocket(9876);
-			
-			
+			for(DatagramSocket ds : users){
+				ds.send(dp);
+			}
+		}catch(IOException ioe){
+		
+		}
+	}
+	
+	public void addUer(DatagramSocket user){
+		for(DatagramSocket ds : users){
+			if(user != ds){
+				users.add(user);
+			}
+		}
+	}
+	
+	public void run(){
+		System.out.println("Starting up the server...");
+		try{
+			this.ds = new DatagramSocket(4445);
+			InetAddress group = InetAddress.getByName("230.0.0.1");
+
+			System.out.println("Server Running");
 			while(true){
+			
 				receiveData = new byte[1024];
 				DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 				ds.receive(receivePacket);
+				
 				String sentence = new String(trim(receivePacket.getData()));
 				System.out.println(sentence);
 				
 				
-				InetAddress IPAddress = receivePacket.getAddress();
+				//InetAddress IPAddress = receivePacket.getAddress();
 				int port = receivePacket.getPort();
-				//String capitalizedSentence = sentence.toUpperCase();
 				sendData = sentence.getBytes();
-				sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
+				sendPacket = new DatagramPacket(sendData, sendData.length, group, port);
 				ds.send(sendPacket);
 			}//end while: continue to listen/broadcast out
 			
@@ -50,9 +74,11 @@ public class UDPServer extends Thread implements Server{
 			
 			
 		}catch(SocketException se){
-		
+			System.out.println("se - Fatal Error - Server Kill.");
+			ds.close();
 		}catch(IOException ioe){
-		
+			System.out.println("ioe - Fatal Error - Server Kill.");
+			ds.close();
 		}
 	
 	

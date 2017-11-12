@@ -15,7 +15,8 @@ import java.net.Socket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.io.*;
-
+import java.net.MulticastSocket;
+import java.net.SocketException;
 
 /////////////// UDP Handling Libraries
 import java.net.DatagramPacket;
@@ -69,6 +70,10 @@ public class ClientGUI extends JFrame{
    InetAddress IPAddress;
    byte[] sendData = new byte[1024];
    byte[] receiveData = new byte[1024];
+	
+	
+	InetAddress group;
+ 	MulticastSocket s;
 	
 	
 	/**
@@ -168,10 +173,17 @@ public class ClientGUI extends JFrame{
 	
 	public void connectToUDP(){
 		try{
-			clientSocket = new DatagramSocket();
-			IPAddress = InetAddress.getByName("localhost");
-		  	this.ip = InetAddress.getLocalHost();
-			//byte[] receiveData = new byte[1024];
+			//clientSocket = new DatagramSocket();
+			//clientSocket.setBroadcast(true);
+			//IPAddress = InetAddress.getByName("192.168.1.255");
+		  	//this.ip = InetAddress.getLocalHost();
+			s = new MulticastSocket(4446);
+			group = InetAddress.getByName("230.0.0.1");
+ 			s.joinGroup(group);
+			
+			//ms = new MulticastSocket(4446);
+        	//address = InetAddress.getByName("230.0.0.1");
+			//ms.joinGroup(address);
 
 			Runnable run = new Runnable() {
 			   public void run() {
@@ -179,7 +191,9 @@ public class ClientGUI extends JFrame{
 						try{
 							receiveData = new byte[1024];
 							DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-					      clientSocket.receive(receivePacket);
+					      s.receive(receivePacket);
+							
+							
 					      String modifiedSentence = new String(trim(receivePacket.getData()));
 							chatPanel.updateMessagesList(modifiedSentence);
 							
@@ -194,12 +208,18 @@ public class ClientGUI extends JFrame{
 
 		}catch(UnknownHostException uhe){
 			System.out.println("can't find ya...");
+		}catch(SocketException se){
+			se.printStackTrace();
+			chatPanel.updateMessagesList("SE - The server has been disconnected - you can no longer chat.");
 		}catch(IOException ie){
-			chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
+			ie.printStackTrace();
+			chatPanel.updateMessagesList("IO - The server has been disconnected - you can no longer chat.");
 		}catch(NullPointerException ne){
-			chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
+			ne.printStackTrace();
+			chatPanel.updateMessagesList("NP - The server has been disconnected - you can no longer chat.");
 		}catch(Exception e){
-			chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
+			e.printStackTrace();
+			chatPanel.updateMessagesList("E - The server has been disconnected - you can no longer chat.");
 		}//end try/catch
 	
 	}//end method: connectUDP
@@ -218,12 +238,18 @@ public class ClientGUI extends JFrame{
 						String line = br.readLine();
 						chatPanel.updateMessagesList(line);
 					}//end while
+				}catch(SocketException se){
+					se.printStackTrace();
+					chatPanel.updateMessagesList("SE - The server has been disconnected - you can no longer chat.");
 				}catch(IOException ie){
-					chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
+					ie.printStackTrace();
+					chatPanel.updateMessagesList("IO - The server has been disconnected - you can no longer chat.");
 				}catch(NullPointerException ne){
-					chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
+					ne.printStackTrace();
+					chatPanel.updateMessagesList("NP - The server has been disconnected - you can no longer chat.");
 				}catch(Exception e){
-					chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
+					e.printStackTrace();
+					chatPanel.updateMessagesList("E - The server has been disconnected - you can no longer chat.");
 				}//end try/catch
 		    }
 		 };
@@ -281,12 +307,11 @@ public class ClientGUI extends JFrame{
 		switch(this.protocol_method){
 			case "udp":
 				try{
-					//BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
-			      
-			      //String sentence = inFromUser.readLine();
 			      sendData = msg.getBytes();
-			      DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
-			      clientSocket.send(sendPacket);					
+			      DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, group, 4446);
+			      s.send(sendPacket);
+					
+									
 				}catch(Exception ioe){
 					System.out.println("There was an issue with UDP...");
 					ioe.printStackTrace();
