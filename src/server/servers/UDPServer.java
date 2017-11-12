@@ -14,7 +14,7 @@ import java.net.*;
 */
 
 
-public class UDPServer implements Server{
+public class UDPServer extends Thread implements Server{
   
 	DatagramSocket ds;
 	DatagramPacket sendPacket;
@@ -22,15 +22,16 @@ public class UDPServer implements Server{
 	byte[] sendData = new byte[1024];
   
 	public UDPServer(){
-		this.startServer();
+		this.start();
 	}
-  
-	public void startServer(){
+	
+	public void run(){
 		try{
 			this.ds = new DatagramSocket(9876);
 			
 			
 			while(true){
+				receiveData = new byte[1024];
 				DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 				ds.receive(receivePacket);
 				String sentence = new String(trim(receivePacket.getData()));
@@ -39,8 +40,8 @@ public class UDPServer implements Server{
 				
 				InetAddress IPAddress = receivePacket.getAddress();
 				int port = receivePacket.getPort();
-				String capitalizedSentence = sentence.toUpperCase();
-				sendData = capitalizedSentence.getBytes();
+				//String capitalizedSentence = sentence.toUpperCase();
+				sendData = sentence.getBytes();
 				sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
 				ds.send(sendPacket);
 			}//end while: continue to listen/broadcast out
@@ -53,6 +54,12 @@ public class UDPServer implements Server{
 		}catch(IOException ioe){
 		
 		}
+	
+	
+	}//end method: run
+  
+	public void startServer(){
+		
 	}
   
 	public void stopServer(){
