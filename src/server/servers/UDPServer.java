@@ -20,14 +20,49 @@ public class UDPServer extends Thread implements Server{
 	DatagramPacket sendPacket;
 	byte[] receiveData = new byte[1024];
 	byte[] sendData = new byte[1024];
+   
+   ArrayList<Integer> connected_ports = new ArrayList<Integer>();
   
 	public UDPServer(){
+      System.out.println("Starting up server...");
 		this.start();
 	}
+   
+   public void checkPort(int port){
+      boolean match = false;
+      for(Integer p : connected_ports){
+         if(p == port){
+            match = true;
+            break;
+         }//end if: do we already have this port?
+      }//end for: go through all connected ports
+      
+      if(!match){
+         connected_ports.add(port);
+      }
+   }//end method: checkPort
+   
+   
+   public void broadcastMessage(byte[] msg, InetAddress ip){
+      try{
+   
+      for(Integer p : connected_ports){
+         sendPacket = new DatagramPacket(msg, msg.length, ip, p);
+         this.ds.send(sendPacket);
+      }//end for: go through all connected ports
+      }catch(IOException ioe){
+         System.out.println("IOE - something is wrong");
+      }catch(Exception e){
+         
+      }
+   }//end method: broadcastMessage
+   
 	
 	public void run(){
+      System.out.println("Running Server");
 		try{
 			this.ds = new DatagramSocket(9876);
+         this.ds.setBroadcast(true);
 			
 			
 			while(true){
@@ -40,10 +75,13 @@ public class UDPServer extends Thread implements Server{
 				
 				InetAddress IPAddress = receivePacket.getAddress();
 				int port = receivePacket.getPort();
+            this.checkPort(port);
+            
 				//String capitalizedSentence = sentence.toUpperCase();
 				sendData = sentence.getBytes();
-				sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
-				ds.send(sendPacket);
+				this.broadcastMessage(sendData, IPAddress);
+            //sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
+				//ds.send(sendPacket);
 			}//end while: continue to listen/broadcast out
 			
 			
