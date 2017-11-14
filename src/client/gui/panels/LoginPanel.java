@@ -100,7 +100,7 @@ public class LoginPanel{
          new ActionListener(){
             public void actionPerformed(ActionEvent e){
                selected_method = "udp";
-					//tcp_ip_port_panel.setVisible(false);
+					tcp_ip_port_panel.setVisible(false);
             }//end action performed
        });//end action listener
 		
