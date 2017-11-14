@@ -129,7 +129,7 @@ public class LoginPanel{
 		
 		this.connect_option_tcp_panel.add(this.connect_option_panel, BorderLayout.NORTH);
 		this.connect_option_tcp_panel.add(this.tcp_ip_port_panel, BorderLayout.CENTER);
-		this.tcp_ip_port_panel.setVisible(false);
+		//this.tcp_ip_port_panel.setVisible(false);
 		
 		//add method message to panel
 		method_msg_container.add(METHOD_MSG);
