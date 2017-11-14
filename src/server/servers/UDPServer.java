@@ -20,14 +20,25 @@ public class UDPServer extends Thread implements Server{
 	DatagramPacket sendPacket;
 	byte[] receiveData = new byte[1024];
 	byte[] sendData = new byte[1024];
+   InetAddress IPAddress;
    
    ArrayList<Integer> connected_ports = new ArrayList<Integer>();
   
 	public UDPServer(){
-      System.out.println("Starting up server...");
+      try{
+         IPAddress = InetAddress.getLocalHost();
+         System.out.println("Starting up server...");
+         System.out.println("Listening on IP: " + IPAddress.getHostAddress());
+      }catch(UnknownHostException uhe){
+      
+      }
 		this.start();
-	}
+	}//end constructor
    
+   /**
+   * Checks if the port is already in our ArrayList and if not, adds it
+   * @param int the port we want to add
+   */
    public void checkPort(int port){
       boolean match = false;
       for(Integer p : connected_ports){
@@ -39,27 +50,31 @@ public class UDPServer extends Thread implements Server{
       
       if(!match){
          connected_ports.add(port);
-      }
+      }//end if: did we have a match?
    }//end method: checkPort
    
-   
+   /**
+   * Sends the message out to all connected ports
+   * @param byte[] the message we want to send
+   * @param InetAddress the ip address we want to send to
+   */
    public void broadcastMessage(byte[] msg, InetAddress ip){
       try{
-   
-      for(Integer p : connected_ports){
-         sendPacket = new DatagramPacket(msg, msg.length, ip, p);
-         this.ds.send(sendPacket);
-      }//end for: go through all connected ports
+         for(Integer p : connected_ports){
+            sendPacket = new DatagramPacket(msg, msg.length, ip, p);
+            this.ds.send(sendPacket);
+         }//end for: go through all connected ports
       }catch(IOException ioe){
          System.out.println("IOE - something is wrong");
       }catch(Exception e){
          
-      }
+      }//end try/catch
    }//end method: broadcastMessage
    
 	
 	public void run(){
       System.out.println("Running Server");
+      
 		try{
 			this.ds = new DatagramSocket(9876);
          this.ds.setBroadcast(true);
@@ -73,15 +88,11 @@ public class UDPServer extends Thread implements Server{
 				System.out.println(sentence);
 				
 				
-				InetAddress IPAddress = receivePacket.getAddress();
+				
 				int port = receivePacket.getPort();
             this.checkPort(port);
-            
-				//String capitalizedSentence = sentence.toUpperCase();
 				sendData = sentence.getBytes();
 				this.broadcastMessage(sendData, IPAddress);
-            //sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
-				//ds.send(sendPacket);
 			}//end while: continue to listen/broadcast out
 			
 			

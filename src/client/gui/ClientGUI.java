@@ -171,8 +171,8 @@ public class ClientGUI extends JFrame{
 			clientSocket = new DatagramSocket();
           clientSocket.setBroadcast(true);
 			IPAddress = InetAddress.getByName("localhost");
-		  	this.ip = InetAddress.getLocalHost();
-			//byte[] receiveData = new byte[1024];
+         IPAddress = InetAddress.getByName(loginPanel.getIPAddress());
+		  	//this.ip = InetAddress.getLocalHost();
 
 			Runnable run = new Runnable() {
 			   public void run() {
