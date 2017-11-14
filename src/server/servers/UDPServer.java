@@ -20,6 +20,7 @@ public class UDPServer extends Thread implements Server{
 	DatagramPacket sendPacket;
 	byte[] receiveData = new byte[1024];
 	byte[] sendData = new byte[1024];
+<<<<<<< HEAD
    InetAddress IPAddress;
    
    ArrayList<Integer> connected_ports = new ArrayList<Integer>();
@@ -75,9 +76,16 @@ public class UDPServer extends Thread implements Server{
 	public void run(){
       System.out.println("Running Server");
       
+=======
+  
+	public UDPServer(){
+		this.start();
+	}
+	
+	public void run(){
+>>>>>>> parent of f55a519... Broadcasts Message
 		try{
 			this.ds = new DatagramSocket(9876);
-         this.ds.setBroadcast(true);
 			
 			
 			while(true){
@@ -90,9 +98,16 @@ public class UDPServer extends Thread implements Server{
 				
 				
 				int port = receivePacket.getPort();
+<<<<<<< HEAD
             this.checkPort(port);
 				sendData = sentence.getBytes();
 				this.broadcastMessage(sendData, IPAddress);
+=======
+				//String capitalizedSentence = sentence.toUpperCase();
+				sendData = sentence.getBytes();
+				sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
+				ds.send(sendPacket);
+>>>>>>> parent of f55a519... Broadcasts Message
 			}//end while: continue to listen/broadcast out
 			
 			

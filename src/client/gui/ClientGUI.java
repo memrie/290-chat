@@ -169,7 +169,6 @@ public class ClientGUI extends JFrame{
 	public void connectToUDP(){
 		try{
 			clientSocket = new DatagramSocket();
-          clientSocket.setBroadcast(true);
 			IPAddress = InetAddress.getByName("localhost");
          IPAddress = InetAddress.getByName(loginPanel.getIPAddress());
 		  	//this.ip = InetAddress.getLocalHost();
