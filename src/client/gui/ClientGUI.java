@@ -171,7 +171,12 @@ public class ClientGUI extends JFrame{
 			clientSocket = new DatagramSocket();
 			IPAddress = InetAddress.getByName("localhost");
 		  	this.ip = InetAddress.getLocalHost();
-			//byte[] receiveData = new byte[1024];
+			
+			//tell the server I have connected
+			String msg = "Connecting...";
+			sendData = msg.getBytes();
+			DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
+			clientSocket.send(sendPacket);	
 
 			Runnable run = new Runnable() {
 			   public void run() {

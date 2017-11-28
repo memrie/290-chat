@@ -35,11 +35,18 @@ public class UDPServer extends Thread implements Server{
 				DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 				ds.receive(receivePacket);
 				String sentence = new String(trim(receivePacket.getData()));
-				System.out.println(sentence);
-				
 				
 				InetAddress IPAddress = receivePacket.getAddress();
 				int port = receivePacket.getPort();
+				
+				if(sentence == "Connecting..."){
+					sentence = "Connected";
+				}
+				
+				System.out.println(sentence);
+				
+				
+				
 				//String capitalizedSentence = sentence.toUpperCase();
 				sendData = sentence.getBytes();
 				sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);

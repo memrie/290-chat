@@ -65,6 +65,43 @@ public class ChatPanel{
 		button_container.setBorder(new EmptyBorder(10, 0, 5, 0));
 		your_message_panel.setBorder(new EmptyBorder(5, 0, 5, 0));
 		
+		
+		//Your message text - shift+enter new line
+		
+		yourMessageTxt.addKeyListener(new KeyAdapter() {
+		  @Override
+		  public void keyPressed(KeyEvent e) {
+		   
+			if(e.getKeyCode() == KeyEvent.VK_SHIFT){
+				System.out.println("shift");
+				if(e.getKeyCode() == KeyEvent.VK_ENTER ) {
+					System.out.println("HELLO");
+					System.out.println(e.getKeyCode());
+		   	}
+			}else{
+				if(e.getKeyCode() == KeyEvent.VK_ENTER ) {
+					System.out.println("Jsut enter");
+					System.out.println(e.getKeyCode());
+		   	}
+			}
+		  }
+	    });
+		 
+
+		
+		/*
+		Action action = new AbstractAction() {...};
+		KeyStroke keyStroke = KeyStroke.getKeyStroke("control Z");
+		InputMap im = component.getInputMap(...);
+		component.getActionMap().put(im.get(keyStroke), action);
+		
+		Action action = new AbstractAction() {...};
+		String keyStrokeAndKey = "control enter";
+		KeyStroke keyStroke = KeyStroke.getKeyStroke(keyStrokeAndKey);
+		component.getInputMap(...).put(keyStroke, keyStrokeAndKey);
+		component.getActionMap().put(keyStrokeAndKey, action);
+		*/
+		
 		//don't let them edit the messageList
 		this.messagesList.setEnabled(false);
 		this.messagesList.setDisabledTextColor(Color.BLACK);

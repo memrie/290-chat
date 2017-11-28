@@ -86,7 +86,7 @@ public class TCPServer implements Server{
         public void run(){
             try{
                 pw = new PrintWriter ( new OutputStreamWriter( cs.getOutputStream()));
-                pw.println("Welcome \n");
+                pw.println("Welcome");
                 pw.flush();
                 pwList.add( pw );
                 br = new BufferedReader( new InputStreamReader( cs.getInputStream()));
