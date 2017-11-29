@@ -169,8 +169,10 @@ public class ClientGUI extends JFrame{
 	public void connectToUDP(){
 		try{
 			clientSocket = new DatagramSocket();
-          clientSocket.setBroadcast(true);
-			IPAddress = InetAddress.getByName("localhost");
+          	clientSocket.setBroadcast(true);
+			IPAddress = InetAddress.getByName("10.100.100.14");
+			System.out.println(IPAddress.isReachable(3000));
+			//IPAddress = InetAddress.getByName(ip);
 		  	this.ip = InetAddress.getLocalHost();
 			//byte[] receiveData = new byte[1024];
 
@@ -180,8 +182,8 @@ public class ClientGUI extends JFrame{
 						try{
 							receiveData = new byte[1024];
 							DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-					      clientSocket.receive(receivePacket);
-					      String modifiedSentence = new String(trim(receivePacket.getData()));
+					      	clientSocket.receive(receivePacket);
+					      	String modifiedSentence = new String(trim(receivePacket.getData()));
 							chatPanel.updateMessagesList(modifiedSentence);
 							
 						}catch(IOException ioe){
@@ -286,12 +288,13 @@ public class ClientGUI extends JFrame{
 			      
 			      //String sentence = inFromUser.readLine();
 			      sendData = msg.getBytes();
+				  System.out.println(IPAddress);
+				  //InetAddress server_ip = InetAddress.getByName("10.100.100.14");
 			      DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
 			      clientSocket.send(sendPacket);					
 				}catch(Exception ioe){
 					System.out.println("There was an issue with UDP...");
 					ioe.printStackTrace();
-					
 				}//end try/catch
 				break;
 			default:
