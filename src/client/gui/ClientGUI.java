@@ -8,6 +8,9 @@ import client.gui.panels.LoginPanel;
 /////////////// General Java Libraries
 import java.util.*;
 import java.text.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 /////////////// Socket Handling Libraries (TCP/IP)
 import java.net.ServerSocket;
@@ -69,6 +72,15 @@ public class ClientGUI extends JFrame{
    InetAddress IPAddress;
    byte[] sendData = new byte[1024];
    byte[] receiveData = new byte[1024];
+	
+	
+	//IP RegEx from
+	//https://www.mkyong.com/regular-expressions/how-to-validate-ip-address-with-regular-expression/
+	private static final String IPADDRESS_PATTERN =
+		"^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+		"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+		"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+		"([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 	
 	
 	/**
@@ -155,7 +167,7 @@ public class ClientGUI extends JFrame{
 				try{
 					String ip = this.loginPanel.getIPAddress();
 					int port = this.loginPanel.getPort();
-					if(ip.equals("") || port < 0){
+					if(ip.equals("") || port < 49152 || port > 65535 || !validIP(ip)){
 						loginPanel.setError("Choose a valid IP and port number.");
 						return false;
 					}//end if: did they give us anything?
@@ -170,6 +182,21 @@ public class ClientGUI extends JFrame{
 		
 		return true;
 	}//end method: connectToSocket
+	
+	
+	/**
+	* returns if the IP address matches a pattern or not
+	* @param String the ip address to test
+	*/
+	public boolean validIP(String ip){
+		Pattern p = Pattern.compile(IPADDRESS_PATTERN);
+		Matcher m = p.matcher(ip);
+	  	return m.matches();
+	}//end method: validIP
+	
+	
+	
+	
 	
 	/**
 	* Utility function from: https://goo.gl/GQ3fR7
