@@ -49,6 +49,7 @@ public class LoginPanel{
 	
 	//flow layouts to make elements center and format/not take up entire window
 	private JPanel btn_container = new JPanel(new FlowLayout());
+	private JPanel err_container = new JPanel(new FlowLayout());
 	private JPanel user_msg_container = new JPanel(new FlowLayout());
 	private JPanel method_msg_container = new JPanel(new FlowLayout());
 	
@@ -58,6 +59,7 @@ public class LoginPanel{
 	private JTextField user_name = new JTextField(20);
 	
 	//connection method messages/inputs
+	private JLabel error_msg = new JLabel("");
 	private final JLabel METHOD_MSG = new JLabel("<html><div style='padding-top:30px;text-align:center; font-size:14pt;font-weight:bold;'>method of connection</div>");
 	private JRadioButton tcp_ip = new JRadioButton("TCP/IP");
 	private JRadioButton udp = new JRadioButton("UDP");
@@ -96,6 +98,8 @@ public class LoginPanel{
             }//end action performed
        });//end action listener
 		 
+		 
+		 
 		 udp.addActionListener(//update to UDP
          new ActionListener(){
             public void actionPerformed(ActionEvent e){
@@ -133,16 +137,21 @@ public class LoginPanel{
 		
 		//add method message to panel
 		method_msg_container.add(METHOD_MSG);
+		this.err_container.add(error_msg);
+		this.connect_option_panel.add(err_container, BorderLayout.NORTH);
 		this.connect_option_panel.add(method_msg_container, BorderLayout.CENTER);
 		this.connect_option_panel.add(connect_panel, BorderLayout.SOUTH);
 		
 		//add button to flow layout panel to prevent from taking up entire bottom area
 		this.btn_container.add(connect_btn);
 		
+		
+		
 		//add two main connection method panels to their wrapper
 		this.connect_prompt.add(connect_option_tcp_panel, BorderLayout.NORTH);
 		this.connect_prompt.add(btn_container,BorderLayout.CENTER);
-
+		
+		
 		
 		//add both prompts to main login panel wrapper
 		this.wrapper.add(user_prompt,BorderLayout.NORTH);
@@ -150,6 +159,11 @@ public class LoginPanel{
 		
 	}//end constructor
 	
+	
+	public void setUpFirstLogin(){
+		tcp_ip.setSelected(true);
+		 tcp_ip_port_panel.setVisible(true);
+	}
 	
 	/** 
 	* Gives you the login panel
@@ -188,7 +202,7 @@ public class LoginPanel{
 	* @return String the IP Address 
 	*/
 	public String getIPAddress(){
-		String ip_address = null;
+		String ip_address = "";
 		
 		if(selected_method == "tcp"){
 			ip_address = this.ip_txt.getText();
@@ -209,5 +223,9 @@ public class LoginPanel{
 		return port_num;
 	}//end method: getIPAddress
 	
-		
+	
+	public void setError(String msg){
+		this.error_msg.setText("<html><div style='padding-top:30px;text-align:center;color:red;'>" + msg + "</div></html>");
+	}//end method: setError
+	
 }//end class: LoginPanel
