@@ -118,7 +118,7 @@ public class ClientGUI extends JFrame{
 		chatPanel.getSendButton().addActionListener(
          new ActionListener(){
             public void actionPerformed(ActionEvent e){
-					sendMessage();
+					sendMessage("not");
 					
             }//end action performed
       });//end action listener
@@ -176,16 +176,17 @@ public class ClientGUI extends JFrame{
 
 			Runnable run = new Runnable() {
 			   public void run() {
+				   sendMessage("none");
 					while (true){
 						try{
 							receiveData = new byte[1024];
 							DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-					      clientSocket.receive(receivePacket);
-					      String modifiedSentence = new String(trim(receivePacket.getData()));
+					      	clientSocket.receive(receivePacket);
+					      	String modifiedSentence = new String(trim(receivePacket.getData()));
 							chatPanel.updateMessagesList(modifiedSentence);
 							
 						}catch(IOException ioe){
-							System.out.println("fuckyou");
+							System.out.println("Exception has occured");
 						}
 					}
 					
@@ -214,6 +215,7 @@ public class ClientGUI extends JFrame{
 			
 			Runnable run = new Runnable() {
 		   public void run() {
+		   		sendMessage("none");
 				try{
 					while(true){
 						String line = br.readLine();
@@ -270,13 +272,19 @@ public class ClientGUI extends JFrame{
 	/**
 	* make a call to the server via the open socket
 	*/
-	public void sendMessage(){
+	public void sendMessage(String _msg){
+		String msgToSend = "";
+
 		DateFormat dateFormat = new SimpleDateFormat("MM/dd HH:mm:ss");
 		//get current date time with Date()
 		Date date = new Date();
-				
-		//build out the message, with the username this user has chosen
-		String msg = this.chat_user  + " [" + dateFormat.format(date) + "] : " + this.chatPanel.getMessage();
+
+		if(_msg != "none"){
+			msgToSend = this.chat_user  + " [" + dateFormat.format(date) + "] : " + this.chatPanel.getMessage();
+		} else {
+			msgToSend = "A client has connected!";
+		}
+
 		//send message
 		
 		switch(this.protocol_method){
@@ -285,7 +293,7 @@ public class ClientGUI extends JFrame{
 					//BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
 			      
 			      //String sentence = inFromUser.readLine();
-			      sendData = msg.getBytes();
+			      sendData = msgToSend.getBytes();
 			      DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
 			      clientSocket.send(sendPacket);					
 				}catch(Exception ioe){
@@ -295,7 +303,7 @@ public class ClientGUI extends JFrame{
 				}//end try/catch
 				break;
 			default:
-				pw.println(msg);
+				pw.println(msgToSend);
 				pw.flush();
 				break;
 		}//end switch: which protocol method?
