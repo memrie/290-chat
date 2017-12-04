@@ -8,6 +8,9 @@ import client.gui.panels.LoginPanel;
 /////////////// General Java Libraries
 import java.util.*;
 import java.text.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 /////////////// Socket Handling Libraries (TCP/IP)
 import java.net.ServerSocket;
@@ -71,6 +74,15 @@ public class ClientGUI extends JFrame{
    byte[] receiveData = new byte[1024];
 	
 	
+	//IP RegEx from
+	//https://www.mkyong.com/regular-expressions/how-to-validate-ip-address-with-regular-expression/
+	private static final String IPADDRESS_PATTERN =
+		"^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+		"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+		"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+		"([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
+	
+	
 	/**
 	* @CONSTRUCTOR
 	*/
@@ -123,7 +135,7 @@ public class ClientGUI extends JFrame{
             }//end action performed
       });//end action listener
 		
-	
+		loginPanel.setUpFirstLogin();
 	}//end constructor
 	
 	
@@ -133,6 +145,13 @@ public class ClientGUI extends JFrame{
 	*/
 	public Boolean connectToSocket(){
 		this.protocol_method = this.loginPanel.getMethod();
+		
+		String unm = this.loginPanel.getUsername();
+		if(unm.equals("")){
+			loginPanel.setError("Choose a valid Username.");
+			return false;
+		}//end if: did they give us a username?
+		
 		
 		//based on connection, the server should make sure only 1
 		//user has their username, otherwise prepend a numeric number
@@ -144,13 +163,40 @@ public class ClientGUI extends JFrame{
 				this.connectToUDP();
 				break;
 			default :
-				//assume TCP/IP
+				
+				try{
+					String ip = this.loginPanel.getIPAddress();
+					int port = this.loginPanel.getPort();
+					if(ip.equals("") || port < 49152 || port > 65535 || !validIP(ip)){
+						loginPanel.setError("Choose a valid IP and port number.");
+						return false;
+					}//end if: did they give us anything?
+				}catch(Exception e){
+					loginPanel.setError("Choose a valid IP and port number.");
+					return false;
+				}//end try/catch: incase they leave a number null
+				//assume TCP/IP - they are on their own now
 				this.connectToTCP();
 				break;
 		}//end switch: which protocol?
 		
 		return true;
 	}//end method: connectToSocket
+	
+	
+	/**
+	* returns if the IP address matches a pattern or not
+	* @param String the ip address to test
+	*/
+	public boolean validIP(String ip){
+		Pattern p = Pattern.compile(IPADDRESS_PATTERN);
+		Matcher m = p.matcher(ip);
+	  	return m.matches();
+	}//end method: validIP
+	
+	
+	
+	
 	
 	/**
 	* Utility function from: https://goo.gl/GQ3fR7
@@ -165,14 +211,15 @@ public class ClientGUI extends JFrame{
 		return Arrays.copyOf(bytes, i + 1);
 	}//end method: trim
 	
-	
+	/**
+	* Allows the user to connect to the UDP server
+	*/
 	public void connectToUDP(){
 		try{
 			clientSocket = new DatagramSocket();
-          clientSocket.setBroadcast(true);
+         clientSocket.setBroadcast(true);
 			IPAddress = InetAddress.getByName("localhost");
 		  	this.ip = InetAddress.getLocalHost();
-			//byte[] receiveData = new byte[1024];
 
 			Runnable run = new Runnable() {
 			   public void run() {
@@ -187,15 +234,18 @@ public class ClientGUI extends JFrame{
 							
 						}catch(IOException ioe){
 							System.out.println("Exception has occured");
-						}
-					}
+							//loginPanel.setError("There was an error connecting.");
+						}//end try/catch
+					}//end while: true
 					
-			   }
-			 };
+			   }//end run()
+			 };//end runnable
+			 
+			 //start the server thread
 			 new Thread(run).start();
 
 		}catch(UnknownHostException uhe){
-			System.out.println("can't find ya...");
+			chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
 		}catch(IOException ie){
 			chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
 		}catch(NullPointerException ne){
@@ -203,10 +253,11 @@ public class ClientGUI extends JFrame{
 		}catch(Exception e){
 			chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
 		}//end try/catch
-	
 	}//end method: connectUDP
 	
-	
+	/**
+	* Allows the user to connect to the TCP server
+	*/
 	public void connectToTCP(){
 		try{
 			socket = new Socket(loginPanel.getIPAddress(), loginPanel.getPort());
@@ -228,23 +279,24 @@ public class ClientGUI extends JFrame{
 				}catch(Exception e){
 					chatPanel.updateMessagesList("The server has been disconnected - you can no longer chat.");
 				}//end try/catch
-		    }
-		 };
+		    }//end while: true
+		 };//end runnable
+		 
+		 //start the server's thread
 		 new Thread(run).start();
 			
 			
 		}catch(UnknownHostException uhe){
-			//jtaMain.append("There is no server available");
-			System.out.println("UnknownHostException | SendHandler");
+			loginPanel.setError("Please check the provided host and port number.");
 		}// end of the catch: UnknownHost
 		catch(IOException ie){
-			System.out.println("IOException --> on connection");
+			loginPanel.setError("There was an error which prevented you from connecting to the server.");
 		}catch(NullPointerException ne){
-			System.out.println("Null pointer - couldn't connect");
+			loginPanel.setError("Please check the provided host and port number.");
 		}catch(Exception e){
-			System.out.println("General Exception - issue");
+			loginPanel.setError("There was an error which prevented you from connecting to the server.");
 		}//end of IO catch
-
+		 
 	}//end method: connectToTCP
 
 	
@@ -286,7 +338,6 @@ public class ClientGUI extends JFrame{
 		}
 
 		//send message
-		
 		switch(this.protocol_method){
 			case "udp":
 				try{
@@ -294,17 +345,20 @@ public class ClientGUI extends JFrame{
 			      
 			      //String sentence = inFromUser.readLine();
 			      sendData = msgToSend.getBytes();
+
 			      DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
 			      clientSocket.send(sendPacket);					
 				}catch(Exception ioe){
-					System.out.println("There was an issue with UDP...");
-					ioe.printStackTrace();
-					
+					this.chatPanel.updateMessagesList("Your message failed to send.");
 				}//end try/catch
 				break;
 			default:
-				pw.println(msgToSend);
-				pw.flush();
+				try{
+					pw.println(msgToSend);
+					pw.flush();
+				}catch(Exception e){
+					this.chatPanel.updateMessagesList("Your message failed to send.");
+				}//end try/catch
 				break;
 		}//end switch: which protocol method?
 		
